@@ -1,0 +1,41 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environment
+# venv/
+# env/
+# .stock_venv/
+# stock_venv/
+# .venv/
+
+# IDE & OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Environment variables
+*.env
+
+# Cache or model checkpoints
+__cache__/
+.cache/
+*.ckpt
+*.h5
+*.pt
+*.pkl
+
+# Jupyter notebook checkpoints
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/
+
+
+Lib
+Scripts
+share
