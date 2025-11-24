@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Stock Forecast</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body style="font-family: Arial; text-align: center; margin: 40px;">
+    <h2>Stock Price Forecast</h2>
+    
+    <form id="form">
+        <input type="text" name="symbol" placeholder="Enter Stock Symbol (AAPL, TSLA...)" required>
+
+        <select name="source" required>
+            <option value="yahoo">Yahoo Finance</option>
+            <option value="google">Google Finance</option>
+        </select>
+
+        <select name="duration" required>
+            <option value="15d">Next 15 Days</option>
+            <option value="3m">Next 3 Months</option>
+            <option value="1y">Next 1 Year</option>
+        </select>
+
+        <!-- New: Model selection dropdown -->
+        <select name="model" required>
+            <option value="arima">ARIMA</option>
+            <option value="lstm">LSTM</option>
+        </select>
+
+        <button type="submit">Get Forecast</button>
+    </form>
+
+    <canvas id="forecastChart" width="800" height="400" style="margin-top: 30px;"></canvas>
+    <img id="plotImg" style="margin-top:20px; max-width:90%; display:none;">
+
+    <script>
+        const form = document.getElementById('form');
+        const ctx = document.getElementById('forecastChart').getContext('2d');
+        let chart;
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/get_data', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                console.log(result);
+
+                if (result.error) {
+                    alert("Error: " + result.error);
+                    return;
+                }
+
+                const labels = result.chart_data.actual_dates.concat(result.chart_data.forecast_dates);
+                const actualValues = result.chart_data.actual_values.concat(
+                    new Array(result.chart_data.forecast_dates.length).fill(null)
+                );
+                const forecastValues = new Array(result.chart_data.actual_dates.length).fill(null)
+                    .concat(result.chart_data.forecast_values);
+
+                if (chart) chart.destroy();
+
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: 'Actual Prices',
+                                data: actualValues,
+                                borderColor: 'purple',
+                                tension: 0.2
+                            },
+                            {
+                                label: 'Forecasted',
+                                data: forecastValues,
+                                borderColor: 'red',
+                                borderDash: [5, 5],
+                                tension: 0.2
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: { display: true, position: 'top' }
+                        },
+                        scales: {
+                            x: { ticks: { autoSkip: true, maxTicksLimit: 15 } }
+                        }
+                    }
+                });
+
+                document.getElementById('plotImg').src = result.chart_data.plot_url;
+                document.getElementById('plotImg').style.display = 'block';
+            } 
+            catch (err) {
+                console.error("Fetch failed:", err);
+                alert("Something went wrong. Check backend logs.");
+            }
+        };
+    </script>
+</body>
+</html>
