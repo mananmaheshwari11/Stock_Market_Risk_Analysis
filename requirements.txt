@@ -1,0 +1,17 @@
+Flask>=2.0
+setuptools==68.2.2
+distlib
+wheel
+yfinance>=0.2.18
+pandas>=1.5
+numpy>=1.24
+scikit-learn>=1.2
+matplotlib>=3.6
+plotly>=5.15.0
+torch>=2.0.0        # for Transformer model; if GPU available will use it
+prophet>=1.1       # pip package name 'prophet' (not fbprophet) -- on Windows may need cmd: pip install prophet --use-pep517
+python-dotenv>=1.0
+requests>=2.28
+pandas-datareader>=0.10  # optional
+gunicorn>=20.1.0   # for hosting (optional)
+tensorflow
